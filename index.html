@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI/UX Design Roadmap | Lucky A.S</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(15, 23, 42, 0.9);
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.45);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 12px 80px;
+    }
+
+    /* Single Master Hub Direct Button */
+    .hub-nav-wrapper {
+      margin-bottom: 20px;
+    }
+
+    .hub-btn {
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 30px;
+      transition: all 0.25s ease;
+      background: var(--accent);
+      color: #030712;
+      box-shadow: 0 0 16px var(--accent-glow);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hub-btn:hover {
+      background: #7dd3fc;
+      transform: translateY(-2px);
+      box-shadow: 0 0 22px var(--accent-glow);
+    }
+
+    .badge {
+      display: inline-block;
+      border: 1px solid #0284c7;
+      color: #38bdf8;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      background: rgba(56, 189, 248, 0.08);
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-align: center;
+      background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      margin-bottom: 25px;
+      max-width: 520px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 35px;
+    }
+
+    .btn {
+      background: #0284c7;
+      color: #fff;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn:hover {
+      background: #0369a1;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .tree-container {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      margin: 10px 0 50px;
+    }
+
+    .root-wrapper {
+      width: 145px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 5;
+    }
+
+    .root-card {
+      background: #080d1a;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 25px var(--accent-glow);
+      border-radius: 20px;
+      padding: 12px 14px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .root-tag {
+      font-size: 0.62rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .root-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .svg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .branch-path {
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      opacity: 0.85;
+    }
+
+    .nodes-column {
+      flex: 1;
+      margin-left: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 5;
+    }
+
+    .node-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+      transform-origin: left center;
+      opacity: 0;
+      transform: scale(0.9) translateX(15px);
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .node-subtopics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #334155;
+      color: #94a3b8;
+    }
+
+    .teacher-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 10px;
+    }
+
+    .yt-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .yt-link:hover {
+      background: #ef4444;
+      color: #fff;
+      transform: scale(1.03);
+    }
+
+    .books-section {
+      width: 100%;
+      max-width: 720px;
+      margin: 20px 0 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 30px;
+    }
+
+    .books-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .books-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .book-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .book-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .book-name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+
+    .book-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .store-actions {
+      display: flex;
+      gap: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 14px;
+    }
+
+    .store-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 8px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .store-btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    .amazon-btn {
+      background: rgba(255, 153, 0, 0.12);
+      border: 1px solid rgba(255, 153, 0, 0.4);
+      color: #ffb84d;
+    }
+
+    .amazon-btn:hover, .amazon-btn:active {
+      background: #ff9900;
+      color: #111;
+      border-color: #ff9900;
+      transform: translateY(-2px);
+    }
+
+    .flipkart-btn {
+      background: rgba(40, 116, 240, 0.12);
+      border: 1px solid rgba(40, 116, 240, 0.4);
+      color: #6da5ff;
+    }
+
+    .flipkart-btn:hover, .flipkart-btn:active {
+      background: #2874f0;
+      color: #fff;
+      border-color: #2874f0;
+      transform: translateY(-2px);
+    }
+
+    .creator-container {
+      margin-top: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .creator-box {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(8, 13, 26, 0.95));
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.25);
+      border-radius: 16px;
+      padding: 16px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s;
+    }
+
+    .creator-box:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .creator-subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      font-weight: 700;
+      color: #38bdf8;
+      text-transform: uppercase;
+    }
+
+    .creator-name {
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      background: linear-gradient(90deg, #ffffff, #38bdf8, #a855f7, #ffffff);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradientMove 5s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .creator-link {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .creator-link:hover {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Single Master Hub Direct Button -->
+  <div class="hub-nav-wrapper">
+    <a href="https://itslucky148.github.io/tech-roadmaps/" class="hub-btn">
+      🏠 Explore All 24+ Tech Roadmaps
+    </a>
+  </div>
+
+  <div class="badge">CAREER GUIDE 2026</div>
+  <h1>UI/UX DESIGN<br>ROADMAP</h1>
+  <p class="subtitle">Step-by-step interactive visual path with best curated YouTube lectures.</p>
+
+  <div class="controls">
+    <button class="btn" id="replayBtn">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      Replay Animation
+    </button>
+    <button class="btn btn-secondary" id="showAllBtn">Show All</button>
+  </div>
+
+  <div class="tree-container" id="treeContainer">
+    <svg class="svg-canvas" id="svgCanvas"></svg>
+
+    <div class="root-wrapper">
+      <div class="root-card" id="rootCard">
+        <div class="root-tag">ROOT ROLE</div>
+        <div class="root-title">Product & UI/UX<br>Designer</div>
+      </div>
+    </div>
+
+    <div class="nodes-column" id="nodesColumn">
+
+      <!-- Node 1 -->
+      <div class="node-card" data-color="#10b981">
+        <div class="node-header" style="color: #34d399;">
+          <span>🎨</span> Design Foundations & Visual Principles
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">Color Theory</span>
+          <span class="tag">Typography</span>
+          <span class="tag">Grid Systems</span>
+          <span class="tag">Visual Hierarchy</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=ui+design+principles+full+course" target="_blank" class="yt-link">▶ UI Design Fundamentals</a>
+          <a href="https://www.youtube.com/results?search_query=typography+and+color+theory+for+ui+designers" target="_blank" class="yt-link">▶ Typography & Color Guide</a>
+        </div>
+      </div>
+
+      <!-- Node 2 -->
+      <div class="node-card" data-color="#38bdf8">
+        <div class="node-header" style="color: #38bdf8;">
+          <span>⚡</span> Figma Mastery & Prototyping
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">Auto Layout</span>
+          <span class="tag">Design Tokens</span>
+          <span class="tag">Component Variants</span>
+          <span class="tag">Micro-Interactions</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=figma+full+course+for+beginners+freecodecamp" target="_blank" class="yt-link">▶ Figma Complete Tutorial</a>
+          <a href="https://www.youtube.com/results?search_query=figma+auto+layout+and+components+masterclass" target="_blank" class="yt-link">▶ Auto Layout & Variants</a>
+        </div>
+      </div>
+
+      <!-- Node 3 -->
+      <div class="node-card" data-color="#f59e0b">
+        <div class="node-header" style="color: #fbbf24;">
+          <span>🔍</span> UX Research & Information Architecture
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">User Personas</span>
+          <span class="tag">Journey Mapping</span>
+          <span class="tag">Wireframing</span>
+          <span class="tag">Card Sorting</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=ux+research+methods+full+course" target="_blank" class="yt-link">▶ UX Research Methods</a>
+          <a href="https://www.youtube.com/results?search_query=information+architecture+and+user+flows" target="_blank" class="yt-link">▶ User Flows & Architecture</a>
+        </div>
+      </div>
+
+      <!-- Node 4 -->
+      <div class="node-card" data-color="#ec4899">
+        <div class="node-header" style="color: #f472b6;">
+          <span>📐</span> Design Systems & Accessibility (a11y)
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">Atomic Design</span>
+          <span class="tag">WCAG 2.2</span>
+          <span class="tag">Dark/Light Themes</span>
+          <span class="tag">Figma Variables</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=building+a+design+system+in+figma" target="_blank" class="yt-link">▶ Building Design Systems</a>
+          <a href="https://www.youtube.com/results?search_query=accessibility+in+ui+ux+wcag" target="_blank" class="yt-link">▶ Accessibility (WCAG) Guide</a>
+        </div>
+      </div>
+
+      <!-- Node 5 -->
+      <div class="node-card" data-color="#a855f7">
+        <div class="node-header" style="color: #c084fc;">
+          <span>🧪</span> Usability Testing & Analytics
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">A/B Testing</span>
+          <span class="tag">Heatmaps (Hotjar)</span>
+          <span class="tag">Heuristic Evaluation</span>
+          <span class="tag">User Feedback Loops</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=usability+testing+methods+tutorial" target="_blank" class="yt-link">▶ Usability Testing Guide</a>
+          <a href="https://www.youtube.com/results?search_query=heuristic+evaluation+nielsen+norman" target="_blank" class="yt-link">▶ Heuristic Evaluation NNGroup</a>
+        </div>
+      </div>
+
+      <!-- Node 6 -->
+      <div class="node-card" data-color="#ef4444">
+        <div class="node-header" style="color: #f87171;">
+          <span>💼</span> Portfolio, Case Studies & Handoff
+        </div>
+        <div class="node-subtopics">
+          <span class="tag">Case Study Writing</span>
+          <span class="tag">Dev Handoff (Zeplin/Dev Mode)</span>
+          <span class="tag">Design Critique</span>
+        </div>
+        <div class="teacher-links">
+          <a href="https://www.youtube.com/results?search_query=ui+ux+case+study+portfolio+guide" target="_blank" class="yt-link">▶ UX Case Study Guide</a>
+          <a href="https://www.youtube.com/results?search_query=designer+to+developer+handoff+figma" target="_blank" class="yt-link">▶ Developer Handoff Workflow</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recommended Books Section with Verified Flipkart Affiliate Links -->
+  <div class="books-section">
+    <div class="books-title"><span>📚</span> Recommended UI/UX Books</div>
+    <div class="books-subtitle">Essential masterworks on human-centered design, usability patterns, and aesthetic precision.</div>
+    <div class="books-grid">
+      
+      <!-- Book 1 -->
+      <div class="book-card">
+        <div>
+          <div class="book-name">The Design of Everyday Things</div>
+          <div class="book-desc">By Don Norman. The universal bible on usability, human psychology, and intuitive interface affordances.</div>
+        </div>
+        <div class="store-actions">
+          <a href="https://www.amazon.in/s?k=The+Design+of+Everyday+Things+Don+Norman&tag=techroadmap26-21" target="_blank" rel="sponsored nofollow noopener" class="store-btn amazon-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.9 14.5c-2.4 1.8-5.9 2.7-8.9 2.7-4.2 0-8-1.5-10.9-4.1-.2-.2-.2-.5 0-.7.3-.2.6-.1.8.1 2.6 2.3 6.1 3.7 9.9 3.7 2.7 0 5.8-.8 8-2.3.4-.3.9.1.8.5-.1.3-.4.5-.7.6zm1.3-.9c-.3-.4-.5-.9-.5-1.4 0-1.4 1.1-2.4 2.5-2.4 1.3 0 2.3.9 2.3 2.3 0 1.5-1.1 2.5-2.5 2.5-.7 0-1.4-.4-1.8-1zm7-2c-.3 0-.6.1-.7.4-.7 1.8-2.4 3-4.3 3-.7 0-1.4-.2-2-.5l-.4-.3c-.3-.2-.7 0-.7.3 0 .2.1.4.3.5.9.5 1.8.8 2.8.8 2.5 0 4.6-1.5 5.5-3.8.1-.3 0-.6-.3-.7-.1-.1-.2-.1-.2-.1z"/></svg>
+            <span>Amazon</span>
+          </a>
+          <a href="https://fktr.in/cke20d8" target="_blank" rel="sponsored nofollow noopener" class="store-btn flipkart-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM7 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm14.3-13.6l-2.4 9.1c-.2.8-1 1.5-1.9 1.5H7.9c-.9 0-1.7-.6-1.9-1.5L3.3 3H1V1h3.3c.9 0 1.7.6 1.9 1.5L7 6h13.2c.7 0 1.2.6 1.1 1.4z"/></svg>
+            <span>Flipkart</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Book 2 -->
+      <div class="book-card">
+        <div>
+          <div class="book-name">Don't Make Me Think</div>
+          <div class="book-desc">By Steve Krug. A common-sense approach to web usability, cognitive load reduction, and effortless navigation.</div>
+        </div>
+        <div class="store-actions">
+          <a href="https://www.amazon.in/s?k=Don%27t+Make+Me+Think+Steve+Krug&tag=techroadmap26-21" target="_blank" rel="sponsored nofollow noopener" class="store-btn amazon-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.9 14.5c-2.4 1.8-5.9 2.7-8.9 2.7-4.2 0-8-1.5-10.9-4.1-.2-.2-.2-.5 0-.7.3-.2.6-.1.8.1 2.6 2.3 6.1 3.7 9.9 3.7 2.7 0 5.8-.8 8-2.3.4-.3.9.1.8.5-.1.3-.4.5-.7.6zm1.3-.9c-.3-.4-.5-.9-.5-1.4 0-1.4 1.1-2.4 2.5-2.4 1.3 0 2.3.9 2.3 2.3 0 1.5-1.1 2.5-2.5 2.5-.7 0-1.4-.4-1.8-1zm7-2c-.3 0-.6.1-.7.4-.7 1.8-2.4 3-4.3 3-.7 0-1.4-.2-2-.5l-.4-.3c-.3-.2-.7 0-.7.3 0 .2.1.4.3.5.9.5 1.8.8 2.8.8 2.5 0 4.6-1.5 5.5-3.8.1-.3 0-.6-.3-.7-.1-.1-.2-.1-.2-.1z"/></svg>
+            <span>Amazon</span>
+          </a>
+          <a href="https://fktr.in/yj1ztJx" target="_blank" rel="sponsored nofollow noopener" class="store-btn flipkart-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM7 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm14.3-13.6l-2.4 9.1c-.2.8-1 1.5-1.9 1.5H7.9c-.9 0-1.7-.6-1.9-1.5L3.3 3H1V1h3.3c.9 0 1.7.6 1.9 1.5L7 6h13.2c.7 0 1.2.6 1.1 1.4z"/></svg>
+            <span>Flipkart</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Book 3 -->
+      <div class="book-card">
+        <div>
+          <div class="book-name">Refactoring UI</div>
+          <div class="book-desc">By Adam Wathan & Steve Schoger. Practical tactical tactics to make interfaces look polished, balanced, and modern.</div>
+        </div>
+        <div class="store-actions">
+          <a href="https://www.amazon.in/s?k=Refactoring+UI+Adam+Wathan&tag=techroadmap26-21" target="_blank" rel="sponsored nofollow noopener" class="store-btn amazon-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.9 14.5c-2.4 1.8-5.9 2.7-8.9 2.7-4.2 0-8-1.5-10.9-4.1-.2-.2-.2-.5 0-.7.3-.2.6-.1.8.1 2.6 2.3 6.1 3.7 9.9 3.7 2.7 0 5.8-.8 8-2.3.4-.3.9.1.8.5-.1.3-.4.5-.7.6zm1.3-.9c-.3-.4-.5-.9-.5-1.4 0-1.4 1.1-2.4 2.5-2.4 1.3 0 2.3.9 2.3 2.3 0 1.5-1.1 2.5-2.5 2.5-.7 0-1.4-.4-1.8-1zm7-2c-.3 0-.6.1-.7.4-.7 1.8-2.4 3-4.3 3-.7 0-1.4-.2-2-.5l-.4-.3c-.3-.2-.7 0-.7.3 0 .2.1.4.3.5.9.5 1.8.8 2.8.8 2.5 0 4.6-1.5 5.5-3.8.1-.3 0-.6-.3-.7-.1-.1-.2-.1-.2-.1z"/></svg>
+            <span>Amazon</span>
+          </a>
+          <a href="https://fktr.in/oN2r7Rw" target="_blank" rel="sponsored nofollow noopener" class="store-btn flipkart-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zM7 18a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm14.3-13.6l-2.4 9.1c-.2.8-1 1.5-1.9 1.5H7.9c-.9 0-1.7-.6-1.9-1.5L3.3 3H1V1h3.3c.9 0 1.7.6 1.9 1.5L7 6h13.2c.7 0 1.2.6 1.1 1.4z"/></svg>
+            <span>Flipkart</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VIP Creator Credit Box -->
+  <div class="creator-container">
+    <div class="creator-box">
+      <div class="creator-subtitle">⚡ DEVELOPED & CREATED BY ⚡</div>
+      <div class="creator-name">Lucky A.S</div>
+      <a href="https://github.com/itslucky148" target="_blank" class="creator-link">
+        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        github.com/itslucky148
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const treeContainer = document.getElementById('treeContainer');
+    const svgCanvas = document.getElementById('svgCanvas');
+    const rootCard = document.getElementById('rootCard');
+    const nodeCards = document.querySelectorAll('.node-card');
+    let masterTimeline = null;
+
+    function renderBranches() {
+      svgCanvas.innerHTML = '';
+      const cRect = treeContainer.getBoundingClientRect();
+      const rRect = rootCard.getBoundingClientRect();
+
+      const startX = rRect.right - cRect.left;
+      const startY = (rRect.top + rRect.bottom) / 2 - cRect.top;
+
+      nodeCards.forEach((card, index) => {
+        const nRect = card.getBoundingClientRect();
+        const endX = nRect.left - cRect.left;
+        const endY = (nRect.top + nRect.bottom) / 2 - cRect.top;
+
+        const deltaX = (endX - startX) * 0.55;
+        const d = `M ${startX} ${startY} C ${startX + deltaX} ${startY}, ${endX - deltaX} ${endY}, ${endX} ${endY}`;
+
+        const color = card.getAttribute('data-color') || '#38bdf8';
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('class', 'branch-path');
+        path.setAttribute('stroke', color);
+        path.setAttribute('id', `path-${index}`);
+
+        svgCanvas.appendChild(path);
+      });
+    }
+
+    function playAnimation() {
+      if (masterTimeline) masterTimeline.kill();
+      renderBranches();
+
+      masterTimeline = gsap.timeline();
+
+      masterTimeline.fromTo(rootCard, 
+        { scale: 0.7, opacity: 0 }, 
+        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
+      );
+
+      nodeCards.forEach((card, i) => {
+        const path = document.getElementById(`path-${i}`);
+        const length = path.getTotalLength();
+
+        gsap.set(path, {
+          strokeDasharray: length,
+          strokeDashoffset: length
+        });
+        gsap.set(card, { opacity: 0, scale: 0.85, x: 20 });
+
+        masterTimeline.to(path, {
+          strokeDashoffset: 0,
+          duration: 0.4,
+          ease: "power2.out"
+        }, "-=0.15");
+
+        masterTimeline.to(card, {
+          opacity: 1,
+          scale: 1,
+          x: 0,
+          duration: 0.35,
+          ease: "back.out(1.4)"
+        }, "-=0.2");
+      });
+    }
+
+    function showAll() {
+      if (masterTimeline) masterTimeline.kill();
+      renderBranches();
+
+      gsap.set(rootCard, { scale: 1, opacity: 1 });
+      nodeCards.forEach((card, i) => {
+        const path = document.getElementById(`path-${i}`);
+        gsap.set(path, { strokeDashoffset: 0, strokeDasharray: 'none' });
+        gsap.set(card, { opacity: 1, scale: 1, x: 0 });
+      });
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(playAnimation, 200);
+    });
+
+    window.addEventListener('resize', () => {
+      renderBranches();
+    });
+
+    document.getElementById('replayBtn').addEventListener('click', playAnimation);
+    document.getElementById('showAllBtn').addEventListener('click', showAll);
+  </script>
+</body>
+</html>
